@@ -950,7 +950,8 @@ def infer_framerate(ts):
     framerate = 1.0 / dt
     return framerate
 
-
+    
+            
 class SumSignal(Signal):
     """Represents the sum of signals."""
     
@@ -1127,7 +1128,7 @@ class GlottalSignal(Sinusoid):
 
 
 class TriangleSignal(Sinusoid):
-    """Represents a triangle signal."""
+    """Represents a  signal."""
     
     def evaluate(self, ts):
         """Evaluates the signal at the given times.
@@ -1415,6 +1416,11 @@ def mag(a):
 
 
 def main():
+    
+    sawTooth = SawtoothSignal_v2(freq = 400, amp = 1, offset = 0); 
+    wave = sawTooth.make_wave()
+    sawTooth.evaluate(wave)
+    
 
     cos_basis = cos_wave(440)
     sin_basis = sin_wave(440)
