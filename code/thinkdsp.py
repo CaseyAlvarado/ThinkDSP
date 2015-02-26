@@ -118,6 +118,10 @@ def read_wave(filename='sound.wav'):
     else:
         ys = numpy.fromstring(z_str, dtype=dtype_map[sampwidth])
 
+    # if it's in stereo, just pull out the first channel
+    if nchannels == 2:
+        ys = ys[::2]
+
     wave = Wave(ys, framerate)
     return wave
 
@@ -412,7 +416,7 @@ class Dct(_SpectrumParent):
 class Spectrogram(object):
     """Represents the spectrum of a signal."""
 
-    def __init__(self, spec_map, seg_length, window_func=None):
+    def __init__(self, spec_map, seg_length=512, window_func=None):
         """Initialize the spectrogram.
 
         spec_map: map from float time to Spectrum
@@ -530,6 +534,15 @@ class Wave(object):
 
     def __len__(self):
         return len(self.ys)
+
+    @property
+    def ts(self):
+        """Times (property).
+
+        returns: NumPy array of times
+        """
+        n = len(self.ys)
+        return numpy.linspace(0, self.duration, n)
 
     @property
     def duration(self):
@@ -716,9 +729,7 @@ class Wave(object):
         """Plots the wave.
 
         """
-        n = len(self.ys)
-        ts = numpy.linspace(0, self.duration, n)
-        thinkplot.plot(ts, self.ys, **options)
+        thinkplot.plot(self.ts, self.ys, **options)
 
     def corr(self, other):
         """Correlation coefficient two waves.
@@ -1121,7 +1132,7 @@ class ParabolicSignal(Sinusoid):
         """
         cycles = self.freq * ts + self.offset / PI2
         frac, _ = numpy.modf(cycles)
-        ys = frac**2
+        ys = (frac - 0.5)**2
         ys = normalize(unbias(ys), self.amp)
         return ys
 
@@ -1198,8 +1209,6 @@ class Chirp(Signal):
         ts: float array of times
         freqs: float array of frequencies during each interval
         """
-        #n = len(freqs)
-        #print freqs[::n/2]
         dts = numpy.diff(ts)
         dps = PI2 * freqs * dts
         phases = numpy.cumsum(dps)
