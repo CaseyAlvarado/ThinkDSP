@@ -21,6 +21,7 @@ import thinkplot
 import warnings
 
 from fractions import gcd
+
 from wave import open as open_wave
 
 import matplotlib.pyplot as pyplot
